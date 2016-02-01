@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.generaldms.mapper.KmItemMapper" >
+  <resultMap id="BaseResultMap" type="com.generaldms.entity.KmItem" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="cid" property="cid" jdbcType="INTEGER" />
+    <result column="parentId" property="parentid" jdbcType="INTEGER" />
+    <result column="fileName" property="filename" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="filePath" property="filepath" jdbcType="VARCHAR" />
+    <result column="createDataTime" property="createdatatime" jdbcType="TIMESTAMP" />
+    <result column="author" property="author" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, cid, type, fileName, content, filePath, createDataTime, author
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from kmitem
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+      select 
+    <include refid="Base_Column_List" />
+    from kmitem
+  </select>
+  <select id="selectItemsByParent" resultMap="BaseResultMap" parameterType="map">
+      select 
+    <include refid="Base_Column_List" />
+    from kmitem
+    where cid = #{cid,jdbcType=INTEGER} and parentId = #{parentid,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from kmitem
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.generaldms.entity.KmItem" >
+    insert into kmitem (id, cid, fileName, 
+      content, filePath, createDataTime, 
+      author)
+    values (#{id,jdbcType=INTEGER}, #{cid,jdbcType=INTEGER}, #{filename,jdbcType=VARCHAR}, 
+      #{content,jdbcType=VARCHAR}, #{filepath,jdbcType=VARCHAR}, #{createdatatime,jdbcType=TIMESTAMP}, 
+      #{author,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.generaldms.entity.KmItem" >
+    insert into kmitem
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="cid != null" >
+        cid,
+      </if>
+      <if test="filename != null" >
+        fileName,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+      <if test="filepath != null" >
+        filePath,
+      </if>
+      <if test="createdatatime != null" >
+        createDataTime,
+      </if>
+      <if test="author != null" >
+        author,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="cid != null" >
+        #{cid,jdbcType=INTEGER},
+      </if>
+      <if test="filename != null" >
+        #{filename,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="filepath != null" >
+        #{filepath,jdbcType=VARCHAR},
+      </if>
+      <if test="createdatatime != null" >
+        #{createdatatime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="author != null" >
+        #{author,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.generaldms.entity.KmItem" >
+    update kmitem
+    <set >
+      <if test="cid != null" >
+        cid = #{cid,jdbcType=INTEGER},
+      </if>
+      <if test="filename != null" >
+        fileName = #{filename,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="filepath != null" >
+        filePath = #{filepath,jdbcType=VARCHAR},
+      </if>
+      <if test="createdatatime != null" >
+        createDataTime = #{createdatatime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="author != null" >
+        author = #{author,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.generaldms.entity.KmItem" >
+    update kmitem
+    set cid = #{cid,jdbcType=INTEGER},
+      fileName = #{filename,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR},
+      filePath = #{filepath,jdbcType=VARCHAR},
+      createDataTime = #{createdatatime,jdbcType=TIMESTAMP},
+      author = #{author,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
