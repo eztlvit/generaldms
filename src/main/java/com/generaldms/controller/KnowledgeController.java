@@ -72,9 +72,8 @@ public class KnowledgeController {
 		System.out.println(treeNode.toString());
 		response.getWriter().print(treeNode.toString());
 	}
-	
-	
-	//递归生成整棵树
+
+	// 递归生成整棵树
 	private void getTreeData(int cid, StringBuffer treeNode, List<KmItem> items) {
 		for (int i = 0; i < items.size(); i++) {
 			treeNode.append(" {\"text\": \"" + items.get(i).getFilename()
@@ -95,14 +94,16 @@ public class KnowledgeController {
 			}
 		}
 	}
-	
-	//异步加载树节点
+
+	// 异步加载树节点
 	@RequestMapping(value = "/initTree")
-	public void initTree(HttpServletRequest request,
+	public void initTree(
+			HttpServletRequest request,
 			HttpServletResponse response,
-			@RequestParam(value = "pid",required=false,defaultValue="0") int parentId,
-			@RequestParam(value = "cid",required=false,defaultValue="0") int cid,
-			@RequestParam(value = "cname",required=false,defaultValue="J") String cName) throws IOException {
+			@RequestParam(value = "pid", required = false, defaultValue = "0") int parentId,
+			@RequestParam(value = "cid", required = false, defaultValue = "0") int cid,
+			@RequestParam(value = "cname", required = false, defaultValue = "J") String cName)
+			throws IOException {
 		byte bb[];
 		bb = cName.getBytes("ISO-8859-1"); // 以"ISO-8859-1"方式解析name字符串
 		cName = new String(bb, "UTF-8"); // 再用"utf-8"格式表示name
@@ -113,20 +114,43 @@ public class KnowledgeController {
 		items = knowledgeBiz.selectItemsByParent(map);
 		StringBuffer nodes = new StringBuffer(" [ ");
 		for (int i = 0; i < items.size(); i++) {
-//			id:13, pId:1, name:"父节点13 - 没有子节点", isParent:true
+			// id:13, pId:1, name:"父节点13 - 没有子节点", isParent:true
 			nodes.append(" { ");
-			nodes.append("\"id\":\""+items.get(i).getId()+"\",");
-			nodes.append("\"pId\":\""+items.get(i).getParentId()+"\",");
-			nodes.append("\"name\":\""+items.get(i).getFilename()+"\"");
+			nodes.append("\"id\":\"" + items.get(i).getId() + "\",");
+			nodes.append("\"pId\":\"" + items.get(i).getParentId() + "\",");
+			nodes.append("\"name\":\"" + items.get(i).getFilename() + "\"");
 			if (items.get(i).getType().equalsIgnoreCase("folder")) {
 				nodes.append(",\"isParent\":\"true\"");
 			}
 			nodes.append(" } ");
-			if((i+1)<items.size()){
+			if ((i + 1) < items.size()) {
 				nodes.append(",");
 			}
 		}
 		nodes.append(" ] ");
 		response.getWriter().print(nodes.toString());
+	}
+
+	@RequestMapping(value = "/deleteKm")
+	public void deleteKm(HttpServletRequest request,
+			HttpServletResponse response, @RequestParam(value = "id") int id)
+			throws IOException {
+		int count = 1;
+		if (count > 0) {
+			response.getWriter().print("{\"isDelete\":true}");
+		} else {
+			response.getWriter().print("{\"isDelete\":false}");
+		}
+	}
+	
+	@RequestMapping(value = "/addKm")
+	public void addKm(HttpServletRequest request, HttpServletResponse response,
+			KmItem kmItem) throws IOException {
+		int count = knowledgeBiz.insertKmItem(kmItem);
+		if (count > 0) {
+			response.getWriter().print("{\"isInsert\":true}");
+		} else {
+			response.getWriter().print("{\"isInsert\":false}");
+		}
 	}
 }

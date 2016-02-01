@@ -82,26 +82,27 @@
 
 										<div class="widget-body">
 											<div class="widget-main padding-8">
-												<ul id="tree1" class="ztree"></ul>
-												<!--<div id="tree1" class="tree"></div>-->
+												<ul id="tree" class="ztree"></ul>
 											</div>
 										</div>
 									</div>
 								</div>
 
 								<div class="col-sm-6">
-									<div class="widget-box">
 										<div class="widget-header header-color-green2">
-											<h4 class="lighter smaller">Browse Files</h4>
+											<h4 class="lighter smaller">File Content</h4>
 										</div>
 
 										<div class="widget-body">
-											<div class="widget-main padding-8">
-												<ul id="tree2" class="ztree"></ul>
-												<input id="tdata" type="text" />
+											<div class="form-group">
+												<div class="widget-main padding-8">
+													<label class="col-sm-2 control-label no-padding-right" for="form-field-1"> Text Field </label>
+													<div class="col-sm-4">
+														<input type="text" id="form-field-1" placeholder="Username" class="col-xs-10 col-sm-5" />
+													</div>
+												</div>
 											</div>
 										</div>
-									</div>
 								</div>
 							</div>
 
@@ -138,6 +139,8 @@
 	<script src="assets/js/jquery-2.0.3.min.js"></script>
 	<script src="assets/js/bootstrap-treeview.js"></script>
 	<script src="assets/js/jquery.ztree.core-3.5.js"></script>
+	<script src="assets/js/jquery.ztree.excheck-3.5.js"></script>
+	<script src="assets/js/jquery.ztree.exedit-3.5.js"></script>
 	<!-- <![endif]-->
 
 	<!--[if IE]>
@@ -188,6 +191,9 @@
 		var cid = $("#cid").val();
 	
 		var setting = {
+			view: {
+				selectedMulti: false
+			},
 			data: {
 				simpleData: {
 					enable: true
@@ -199,16 +205,52 @@
 				autoParam:["id=pid"],
 				otherParam:{"cname":cname,"cid":cid},
 				dataFilter: filter
+			},
+			callback: {
+				beforeClick: beforeClick,
+				onRemove: onRemove,
+				beforeRemove: beforeRemove,
+				onClick: onClick
+			},
+			edit: {
+				enable: true,
+				editNameSelectAll: true,
+				showRemoveBtn: showRemoveBtn,
+				showRenameBtn: false
 			}
 		};
-
+		
 		function filter(treeId, parentNode, childNodes) {
 			if (!childNodes) return null;
 			for (var i=0, l=childNodes.length; i<l; i++) {
 				childNodes[i].name = childNodes[i].name.replace(/\.n/g, '.');
 			}
 			return childNodes;
-		}
+		};
+
+		function showRemoveBtn(treeId, treeNode) {
+			return (!treeNode.isParent&&!treeNode.isFirstNode);
+		};
+
+		function onRemove(e, treeId, treeNode) {
+			deleteNode(treeNode.id);
+		};
+
+		function beforeRemove(treeId, treeNode) {
+			var zTree = $.fn.zTree.getZTreeObj("tree");
+			zTree.selectNode(treeNode);
+			return confirm("确认删除 节点 -- " + treeNode.name + " 吗？");
+		};
+		
+		function beforeClick(treeId, treeNode, clickFlag) {
+			//alert("[ "+treeId+" beforeClick ]&nbsp;&nbsp;" + treeNode.name );
+			return (treeNode.click != false);
+		};
+
+		function onClick(event, treeId, treeNode, clickFlag) {
+			alert(treeNode.id+" isParent:"+treeNode.isParent);
+		};
+		
 		function initTree(cid,cname,pid) {
 			$.ajax({
 				type : "post",
@@ -224,62 +266,24 @@
 			});
 		};
 
+		function deleteNode(id){
+			$.ajax({
+				type:"post",
+				dataType:"json",
+				contentType:"application/test;charset=utf-8",
+				url:"/generaldms/deleteKm?id="+id,
+				success : function(data) {
+					if(data.isDelete==true){
+						alert("删除成功!");
+					}else{
+						alert("删除失败!");
+					}
+				}
+			});
+		}
+		
 		jQuery(function($) {
-
-			$.fn.zTree.init($("#tree2"), setting);
-			//initTree(cid,cname,pid);
-			
-				//var zNodes =  [  { "id":1,"pId":null,"name":"test","isParent":true } , { "id":2,"pId":null,"name":"test1" } , { "id":3,"pId":null,"name":"item2","isParent":true }  ]; 
-				
-
-				//$.fn.zTree.init($("#tree2"), setting , zNodes);
-			/**
-			initTree(cid,cname,pid);
-			
-			window.onload = function(){
-				
-			};
-
-			
-			$('#tree1')
-					.ace_tree(
-							{
-								dataSource : treeDataSource,
-								multiSelect : true,
-								loadingHTML : '<div class="tree-loading"><i class="icon-refresh icon-spin blue"></i></div>',
-								'open-icon' : 'icon-minus',
-								'close-icon' : 'icon-plus',
-								'selectable' : true,
-								'selected-icon' : 'icon-ok',
-								'unselected-icon' : 'icon-remove'
-							});
-			
-			
-			$('#tree2')
-					.ace_tree(
-							{
-								dataSource : treeDataSource2,
-								loadingHTML : '<div class="tree-loading"><i class="icon-refresh icon-spin blue"></i></div>',
-								'open-icon' : 'icon-folder-open',
-								'close-icon' : 'icon-folder-close',
-								'selectable' : false,
-								'selected-icon' : null,
-								'unselected-icon' : null
-							});*/
-
-			/**
-			$('#tree1').on('loaded', function (evt, data) {
-			});
-
-			$('#tree1').on('opened', function (evt, data) {
-			});
-
-			$('#tree1').on('closed', function (evt, data) {
-			});
-
-			$('#tree1').on('selected', function (evt, data) {
-			});
-			 */
+			$.fn.zTree.init($("#tree"), setting);
 		});
 	</script>
 
