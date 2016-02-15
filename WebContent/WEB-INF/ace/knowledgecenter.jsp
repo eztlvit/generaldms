@@ -73,6 +73,7 @@
 							<!-- PAGE CONTENT BEGINS -->
 							<input id="cid" type="hidden" value="${cId}" />
 							<input id="cname" type="hidden" value="${cName}" />
+							<input id="parentId" type="hidden" value="0" />
 							<div class="row">
 								<div class="col-sm-6">
 									<div class="widget-box">
@@ -88,7 +89,7 @@
 									</div>
 								</div>
 
-								<div class="col-sm-6">
+								<div class="col-sm-6" style="display: none;" id="info">
 										<div class="widget-header header-color-green2">
 											<h4 class="lighter smaller">File Content</h4>
 										</div>
@@ -97,22 +98,23 @@
 											<div class="form-group">
 												<div class="widget-main padding-8">
 													<div>
-														<label> Text Field </label>
-														<input type="text" id="form-field-1" placeholder="Username"/>
+														<label>File Name</label>
+														<input type="text" id="filename" placeholder="filename"/>
 													</div>
 													<div>
-														<label>Default</label>
+														<label>Type</label>
 
-														<select id="form-field-select-1">
+														<select id="type">
 															<option value="">&nbsp;</option>
-															<option value="AL">Alabama</option>
-															<option value="AK">Alaska</option>
+															<option value="folder">Floder</option>
+															<option value="item">File</option>
 														</select>
 													</div>
 														
 													<div>
-														
+														<textarea id="content" rows="30" cols="50" name="editor01">请输入.</textarea>
 													</div>
+													<input type="button" onclick="addNode();" value="submit"/>
 												</div>
 											</div>
 										</div>
@@ -122,7 +124,6 @@
 							<script type="text/javascript">
 								var $assets = "assets";//this will be used in fuelux.tree-sampledata.js
 							</script>
-							<script src="//cdn.ckeditor.com/4.5.7/full/ckeditor.js"></script>
 
 							<!-- PAGE CONTENT ENDS -->
 						</div>
@@ -155,6 +156,7 @@
 	<script src="assets/js/jquery.ztree.core-3.5.js"></script>
 	<script src="assets/js/jquery.ztree.excheck-3.5.js"></script>
 	<script src="assets/js/jquery.ztree.exedit-3.5.js"></script>
+	<script src="plugin/ckeditor/ckeditor.js"></script>
 	<!-- <![endif]-->
 
 	<!--[if IE]>
@@ -200,6 +202,7 @@
 	<!-- inline scripts related to this page -->
 
 	<script type="text/javascript">
+		CKEDITOR.replaceAll();
 		var pid = 0;
 		var cname = $("#cname").val();
 		var cid = $("#cid").val();
@@ -262,7 +265,14 @@
 		};
 
 		function onClick(event, treeId, treeNode, clickFlag) {
+			$("#parentId").val(treeNode.id);
+			//alert($("#parentId").val());
 			alert(treeNode.id+" isParent:"+treeNode.isParent);
+			if(treeNode.isParent==true){
+				$("#info").css('display','block'); 
+			}else{
+				$("#info").css('display','none'); 
+			}
 		};
 		
 		function initTree(cid,cname,pid) {
@@ -291,6 +301,27 @@
 						alert("删除成功!");
 					}else{
 						alert("删除失败!");
+					}
+				}
+			});
+		}
+		
+		function addNode(){
+			var cid = $("#cid").val();
+			var parentId = $("#parentId").val();
+			var filename = $("#filename").val();
+			var type = $("#type").val();
+			var content = CKEDITOR.instances.content.getData();
+			$.ajax({
+				type:"post",
+				dataType:"json",
+				contentType:"application/test;charset=utf-8",
+				url:"/generaldms/addKm?cid="+cid+"&parentid="+parentId+"&filename="+filename+"&content="+content+"&type="+type,
+				success : function(data) {
+					if(data.isInsert==true){
+						alert("增加成功!");
+					}else{
+						alert("增加失败!");
 					}
 				}
 			});

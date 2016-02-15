@@ -7,7 +7,7 @@ public class KmItem {
 
     private Integer cid;
     
-    private Integer parentId;
+    private Integer parentid;
 
     private String filename;
 
@@ -85,12 +85,12 @@ public class KmItem {
 		this.type = type;
 	}
 
-	public Integer getParentId() {
-		return parentId;
+	public Integer getParentid() {
+		return parentid;
 	}
 
-	public void setParentId(Integer parentId) {
-		this.parentId = parentId;
+	public void setParentid(Integer parentid) {
+		this.parentid = parentid;
 	}
-    
+
 }

@@ -13,7 +13,7 @@
     <result column="type" property="type" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, cid, type, fileName, content, filePath, createDataTime, author
+    id, cid, type, fileName, content, filePath, createDataTime, author, parentId
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -37,10 +37,10 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.generaldms.entity.KmItem" >
-    insert into kmitem (id, cid, fileName, 
+    insert into kmitem (id, type, cid, parentId, fileName, 
       content, filePath, createDataTime, 
       author)
-    values (#{id,jdbcType=INTEGER}, #{cid,jdbcType=INTEGER}, #{filename,jdbcType=VARCHAR}, 
+    values (#{id,jdbcType=INTEGER}, #{type,jdbcType=VARCHAR}, #{cid,jdbcType=INTEGER}, #{parentid,jdbcType=INTEGER}, #{filename,jdbcType=VARCHAR}, 
       #{content,jdbcType=VARCHAR}, #{filepath,jdbcType=VARCHAR}, #{createdatatime,jdbcType=TIMESTAMP}, 
       #{author,jdbcType=VARCHAR})
   </insert>

@@ -18,6 +18,7 @@
 			</list>
 		</property>
 	</bean> -->
+	<mvc:resources location="/resource/plugin/" mapping="plugin/**"/>
 	<mvc:resources location="/resource/assets/css/" mapping="assets/css/**"/>
 	<mvc:resources location="/resource/assets/js/" mapping="assets/js/**"/>
 	<mvc:resources location="/resource/assets/font/" mapping="assets/font/**"/>

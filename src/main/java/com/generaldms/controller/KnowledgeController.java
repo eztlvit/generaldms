@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.generaldms.biz.KnowledgeBiz;
 import com.generaldms.entity.KmItem;
+import com.mysql.fabric.xmlrpc.base.Data;
 
 @Controller
 public class KnowledgeController {
@@ -117,7 +119,7 @@ public class KnowledgeController {
 			// id:13, pId:1, name:"父节点13 - 没有子节点", isParent:true
 			nodes.append(" { ");
 			nodes.append("\"id\":\"" + items.get(i).getId() + "\",");
-			nodes.append("\"pId\":\"" + items.get(i).getParentId() + "\",");
+			nodes.append("\"pId\":\"" + items.get(i).getParentid() + "\",");
 			nodes.append("\"name\":\"" + items.get(i).getFilename() + "\"");
 			if (items.get(i).getType().equalsIgnoreCase("folder")) {
 				nodes.append(",\"isParent\":\"true\"");
@@ -146,6 +148,7 @@ public class KnowledgeController {
 	@RequestMapping(value = "/addKm")
 	public void addKm(HttpServletRequest request, HttpServletResponse response,
 			KmItem kmItem) throws IOException {
+		kmItem.setCreatedatatime(new Date());
 		int count = knowledgeBiz.insertKmItem(kmItem);
 		if (count > 0) {
 			response.getWriter().print("{\"isInsert\":true}");
