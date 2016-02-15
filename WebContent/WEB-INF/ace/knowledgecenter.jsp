@@ -77,7 +77,7 @@
 								<div class="col-sm-6">
 									<div class="widget-box">
 										<div class="widget-header header-color-blue2">
-											<h4 class="lighter smaller">Choose Categories</h4>
+											<h4 class="lighter smaller">${cName}</h4>
 										</div>
 
 										<div class="widget-body">
@@ -96,9 +96,22 @@
 										<div class="widget-body">
 											<div class="form-group">
 												<div class="widget-main padding-8">
-													<label class="col-sm-2 control-label no-padding-right" for="form-field-1"> Text Field </label>
-													<div class="col-sm-4">
-														<input type="text" id="form-field-1" placeholder="Username" class="col-xs-10 col-sm-5" />
+													<div>
+														<label> Text Field </label>
+														<input type="text" id="form-field-1" placeholder="Username"/>
+													</div>
+													<div>
+														<label>Default</label>
+
+														<select id="form-field-select-1">
+															<option value="">&nbsp;</option>
+															<option value="AL">Alabama</option>
+															<option value="AK">Alaska</option>
+														</select>
+													</div>
+														
+													<div>
+														
 													</div>
 												</div>
 											</div>
@@ -109,6 +122,7 @@
 							<script type="text/javascript">
 								var $assets = "assets";//this will be used in fuelux.tree-sampledata.js
 							</script>
+							<script src="//cdn.ckeditor.com/4.5.7/full/ckeditor.js"></script>
 
 							<!-- PAGE CONTENT ENDS -->
 						</div>
