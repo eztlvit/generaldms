@@ -327,39 +327,39 @@
 					 	content:content
 			        };
 			var jsonString = JSON.stringify(kmitem);
+			//alert(kmitem);
 			$.ajax({
 				type:"post",
-				dataType:"json",
 				url:"/generaldms/updateKm",
 				data: jsonString,
-				contentType:"application/json;charset=utf-8",
-				success:function(resultData){
-					if(resultData.isUpate==true){
+				contentType : "application/json ; charset=utf-8", 
+				success : function(resultData) {
+					if (resultData.isUpate == true) {
 						alert("成功!");
-					}else{
+					} else {
 						alert("失败!");
 					}
 				}
 			});
 		}
-		
-		function deleteNode(id){
+
+		function deleteNode(id) {
 			$.ajax({
-				type:"post",
-				dataType:"json",
-				contentType:"application/json;charset=utf-8",
-				url:"/generaldms/deleteKm?id="+id,
+				type : "post",
+				dataType : "json",
+				contentType : "application/json;charset=utf-8",
+				url : "/generaldms/deleteKm?id=" + id,
 				success : function(data) {
-					if(data.isDelete==true){
+					if (data.isDelete == true) {
 						alert("删除成功!");
-					}else{
+					} else {
 						alert("删除失败!");
 					}
 				}
 			});
 		}
-		
-		function addNode(){
+
+		function addNode() {
 			var cid = $("#cid").val();
 			var parentId = $("#parentId").val();
 			var filename = $("#filename").val();
@@ -368,25 +368,27 @@
 			var cname = $("#cname").val();
 			var content = CKEDITOR.instances.content.getData();
 			$.ajax({
-				type:"post",
-				dataType:"json",
-				contentType:"application/json;charset=utf-8",
-				url:"/generaldms/addKm?cid="+cid+"&parentid="+parentId+"&filename="+filename+"&content="+content+"&type="+type,
+				type : "post",
+				dataType : "json",
+				contentType : "application/json;charset=utf-8",
+				url : "/generaldms/addKm?cid=" + cid + "&parentid=" + parentId
+						+ "&filename=" + filename + "&content=" + content
+						+ "&type=" + type,
 				success : function(data) {
-					if(data.isInsert==true){
+					if (data.isInsert == true) {
 						$("#filename").val("");
 						$("#type").val("");
 						CKEDITOR.instances.content.setData("");
-						$("#info").css('display','none'); 
+						$("#info").css('display', 'none');
 						$.fn.zTree.init($("#tree"), setting);
 						alert("增加成功!");
-					}else{
+					} else {
 						alert("增加失败!");
 					}
 				}
 			});
 		}
-		
+
 		jQuery(function($) {
 			$.fn.zTree.init($("#tree"), setting);
 		});

@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -175,10 +176,10 @@ public class KnowledgeController {
 		}
 	}
 	
-	@RequestMapping(value = "/updateKm", consumes = "application/json")
+	@RequestMapping(value = "/updateKm")
 	@ResponseBody
 	public void updateKm(@RequestBody KmItem kmItem,HttpServletRequest request,
-			HttpServletResponse response) throws JSONException, IOException {
+			HttpServletResponse response) throws IOException {
 		int count = knowledgeBiz.updateKmItemByPrimaryKeySelective(kmItem);
 		if (count > 0) {
 			response.getWriter().print("{\"isUpate\":true}");
@@ -186,4 +187,5 @@ public class KnowledgeController {
 			response.getWriter().print("{\"isUpate\":false}");
 		}
 	}
+	
 }
