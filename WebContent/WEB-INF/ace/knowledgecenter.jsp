@@ -74,6 +74,7 @@
 							<input id="cid" type="hidden" value="${cId}" />
 							<input id="cname" type="hidden" value="${cName}" />
 							<input id="parentId" type="hidden" value="0" />
+							<input id="itemId" type="hidden" value="0" />
 							<div class="row">
 								<div class="col-sm-6">
 									<div class="widget-box">
@@ -91,7 +92,7 @@
 
 								<div class="col-sm-6" style="display: none;" id="info">
 										<div class="widget-header header-color-green2">
-											<h4 class="lighter smaller">File Content</h4>
+											<h4 class="lighter smaller" id="fileTitle">File Content</h4>
 										</div>
 
 										<div class="widget-body">
@@ -114,7 +115,8 @@
 													<div>
 														<textarea id="content" rows="30" cols="50" name="editor01">请输入.</textarea>
 													</div>
-													<input type="button" onclick="addNode();" value="submit"/>
+													<input id="add" type="button" onclick="addNode();" value="Add"/>
+													<input id="update" type="button" onclick="updateNode();" value="Update"/>
 												</div>
 											</div>
 										</div>
@@ -265,13 +267,23 @@
 		};
 
 		function onClick(event, treeId, treeNode, clickFlag) {
-			$("#parentId").val(treeNode.id);
 			//alert($("#parentId").val());
 			alert(treeNode.id+" isParent:"+treeNode.isParent);
+			var nid = treeNode.id;
 			if(treeNode.isParent==true){
-				$("#info").css('display','block'); 
+				$("#parentId").val(nid);
+				$("#filename").val("");
+				$("#type").val("");
+				CKEDITOR.instances.content.setData("");
+				$("#info").css('display','block');
+				$("#update").css('display','none');
+				$("#add").css('display','block');
 			}else{
-				$("#info").css('display','none'); 
+				$("#info").css('display','block');
+				$("#add").css('display','none');
+				$("#update").css('display','block');
+				$("#itemId").val(nid);
+				getNodeInfo(nid);
 			}
 		};
 		
@@ -289,12 +301,53 @@
 				}
 			});
 		};
-
+		
+		function getNodeInfo(id){
+			$.ajax({
+				type:"post",
+				dataType:"json",
+				contentType:"application/json;charset=utf-8",
+				url:"/generaldms/getKmItem?id="+id,
+				success:function(data){
+					$("#filename").val(data.filename);
+					$("#fileTitle").html(data.filename)
+					$("#type").val(data.type);
+					CKEDITOR.instances.content.setData(data.content);
+				}
+			});
+		}
+		
+		function updateNode(){
+			var itemId = $("#itemId").val();
+			var filename = $("#filename").val();
+			var content = CKEDITOR.instances.content.getData();
+			var kmitem = {
+					 	id:itemId,
+					 	filename:filename,
+					 	content:content
+			        };
+			var jsonString = JSON.stringify(kmitem);
+			$.ajax({
+				type:"post",
+				dataType:"json",
+				url:"/generaldms/updateKm",
+				data: jsonString,
+				contentType:"application/json;charset=utf-8",
+				success:function(resultData){
+					if(resultData.isUpate==true){
+						alert("成功!");
+					}else{
+						alert("失败!");
+					}
+				}
+			});
+		}
+		
 		function deleteNode(id){
 			$.ajax({
 				type:"post",
 				dataType:"json",
-				contentType:"application/test;charset=utf-8",
+				contentType:"application/json;charset=utf-8",
 				url:"/generaldms/deleteKm?id="+id,
 				success : function(data) {
 					if(data.isDelete==true){
@@ -311,14 +364,21 @@
 			var parentId = $("#parentId").val();
 			var filename = $("#filename").val();
 			var type = $("#type").val();
+			var pid = 0;
+			var cname = $("#cname").val();
 			var content = CKEDITOR.instances.content.getData();
 			$.ajax({
 				type:"post",
 				dataType:"json",
-				contentType:"application/test;charset=utf-8",
+				contentType:"application/json;charset=utf-8",
 				url:"/generaldms/addKm?cid="+cid+"&parentid="+parentId+"&filename="+filename+"&content="+content+"&type="+type,
 				success : function(data) {
 					if(data.isInsert==true){
+						$("#filename").val("");
+						$("#type").val("");
+						CKEDITOR.instances.content.setData("");
+						$("#info").css('display','none'); 
+						$.fn.zTree.init($("#tree"), setting);
 						alert("增加成功!");
 					}else{
 						alert("增加失败!");

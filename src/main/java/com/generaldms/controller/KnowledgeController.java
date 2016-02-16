@@ -13,12 +13,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.ibatis.annotations.Param;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.generaldms.biz.KnowledgeBiz;
 import com.generaldms.entity.KmItem;
@@ -137,7 +142,7 @@ public class KnowledgeController {
 	public void deleteKm(HttpServletRequest request,
 			HttpServletResponse response, @RequestParam(value = "id") int id)
 			throws IOException {
-		int count = 1;
+		int count = knowledgeBiz.deleteKmItemByPrimaryKey(id);
 		if (count > 0) {
 			response.getWriter().print("{\"isDelete\":true}");
 		} else {
@@ -154,6 +159,31 @@ public class KnowledgeController {
 			response.getWriter().print("{\"isInsert\":true}");
 		} else {
 			response.getWriter().print("{\"isInsert\":false}");
+		}
+	}
+	
+	@RequestMapping(value = "/getKmItem")
+	public void getKmItem(HttpServletRequest request,
+			HttpServletResponse response, @RequestParam(value = "id") int id) throws JSONException, IOException {
+		KmItem kmItem = knowledgeBiz.selectKmItemByPrimaryKey(id);
+		if (null!=kmItem) {
+			JSONObject jsonObject = new JSONObject();
+			jsonObject.put("content", kmItem.getContent());
+			jsonObject.put("filename", kmItem.getFilename());
+			jsonObject.put("type", kmItem.getType());
+			response.getWriter().print(jsonObject.toString());
+		}
+	}
+	
+	@RequestMapping(value = "/updateKm", consumes = "application/json")
+	@ResponseBody
+	public void updateKm(@RequestBody KmItem kmItem,HttpServletRequest request,
+			HttpServletResponse response) throws JSONException, IOException {
+		int count = knowledgeBiz.updateKmItemByPrimaryKeySelective(kmItem);
+		if (count > 0) {
+			response.getWriter().print("{\"isUpate\":true}");
+		} else {
+			response.getWriter().print("{\"isUpate\":false}");
 		}
 	}
 }

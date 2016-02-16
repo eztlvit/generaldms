@@ -93,4 +93,17 @@ public class KmItem {
 		this.parentid = parentid;
 	}
 
+	public KmItem(Integer id,String filename,
+			String content) {
+		super();
+		this.id = id;
+		this.filename = filename;
+		this.content = content;
+	}
+
+	public KmItem() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	
 }
