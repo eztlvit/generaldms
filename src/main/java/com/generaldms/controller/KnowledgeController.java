@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.generaldms.biz.KnowledgeBiz;
+import com.generaldms.entity.KmCatalogue;
 import com.generaldms.entity.KmItem;
 import com.mysql.fabric.xmlrpc.base.Data;
 
@@ -35,6 +36,7 @@ public class KnowledgeController {
 
 	@Autowired
 	private KnowledgeBiz knowledgeBiz;
+	private List<KmCatalogue> kmCatalogueLst;
 
 	@RequestMapping(value = "/getKnowledgeData")
 	public String getKnowledgeData(HttpServletRequest request,
@@ -47,6 +49,8 @@ public class KnowledgeController {
 		bb = cName.getBytes("ISO-8859-1"); // 以"ISO-8859-1"方式解析name字符串
 		cName = new String(bb, "UTF-8"); // 再用"utf-8"格式表示name
 		map.put("cName", cName);
+		kmCatalogueLst = knowledgeBiz.selectAllCatalogue();
+		map.put("kmCatalogueLst", kmCatalogueLst);
 		return "/knowledgecenter";
 	}
 
@@ -141,19 +145,48 @@ public class KnowledgeController {
 
 	@RequestMapping(value = "/deleteKm")
 	public void deleteKm(HttpServletRequest request,
-			HttpServletResponse response, @RequestParam(value = "id") int id)
+			HttpServletResponse response, @RequestParam(value = "id") int id,@RequestParam(value = "cid") int cid,@RequestParam(value = "isParent") Boolean isParent)
 			throws IOException {
-		int count = knowledgeBiz.deleteKmItemByPrimaryKey(id);
-		if (count > 0) {
-			response.getWriter().print("{\"isDelete\":true}");
-		} else {
+		int count = 0;
+		
+		try {
+			if (isParent) {
+				count = deleteKmFolder(id, cid);
+			}else {
+				count = knowledgeBiz.deleteKmItemByPrimaryKey(id);
+			}
+			 
+			if (count > 0) {
+				response.getWriter().print("{\"isDelete\":true}");
+			} else {
+				response.getWriter().print("{\"isDelete\":false}");
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
 			response.getWriter().print("{\"isDelete\":false}");
 		}
+	}
+
+	private int deleteKmFolder(int id, int cid) {
+		int count;
+		Map<String, Integer> tempSubMap = new HashMap<String, Integer>();
+		tempSubMap.put("cid", cid);
+		tempSubMap.put("parentid", id);
+		List<KmItem> deleteKmItems = knowledgeBiz.selectItemsByParent(tempSubMap);
+		for (KmItem kmItem : deleteKmItems) {
+			if (kmItem.getType().equalsIgnoreCase("folder")) {
+				deleteKmFolder(kmItem.getId(),kmItem.getCid());
+			}else {
+				knowledgeBiz.deleteKmItemByPrimaryKey(kmItem.getId());
+			}
+		}
+		count = knowledgeBiz.deleteKmItemByPrimaryKey(id);
+		return count;
 	}
 	
 	@RequestMapping(value = "/addKm")
 	public void addKm(HttpServletRequest request, HttpServletResponse response,
-			KmItem kmItem) throws IOException {
+			@RequestBody KmItem kmItem) throws IOException {
 		kmItem.setCreatedatatime(new Date());
 		int count = knowledgeBiz.insertKmItem(kmItem);
 		if (count > 0) {

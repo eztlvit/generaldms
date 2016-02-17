@@ -76,7 +76,7 @@
 							<input id="parentId" type="hidden" value="0" />
 							<input id="itemId" type="hidden" value="0" />
 							<div class="row">
-								<div class="col-sm-6">
+								<div class="col-sm-2">
 									<div class="widget-box">
 										<div class="widget-header header-color-blue2">
 											<h4 class="lighter smaller">${cName}</h4>
@@ -90,7 +90,7 @@
 									</div>
 								</div>
 
-								<div class="col-sm-6" style="display: none;" id="info">
+								<div class="col-sm-10" style="display: none;" id="info">
 										<div class="widget-header header-color-green2">
 											<h4 class="lighter smaller" id="fileTitle">File Content</h4>
 										</div>
@@ -98,12 +98,12 @@
 										<div class="widget-body">
 											<div class="form-group">
 												<div class="widget-main padding-8">
-													<div>
-														<label>File Name</label>
+													<div style="float: left;margin: 5px;">
+														<label>File Name : </label>
 														<input type="text" id="filename" placeholder="filename"/>
 													</div>
-													<div>
-														<label>Type</label>
+													<div id="filetype"  style="float: left;margin: 5px;">
+														<label>File Type : </label>
 
 														<select id="type">
 															<option value="">&nbsp;</option>
@@ -111,12 +111,14 @@
 															<option value="item">File</option>
 														</select>
 													</div>
-														
+													<div style="clear: both;"></div>	
 													<div>
-														<textarea id="content" rows="30" cols="50" name="editor01">请输入.</textarea>
+														<textarea id="content" rows="90" cols="50" name="editor01">请输入.</textarea>
 													</div>
-													<input id="add" type="button" onclick="addNode();" value="Add"/>
-													<input id="update" type="button" onclick="updateNode();" value="Update"/>
+													<div style="text-align: center;margin-top: 10px;">
+														<input id="add" type="button" onclick="addNode();" value="Add" style="margin-left: auto;margin-right: auto;"/>
+														<input id="update" type="button" onclick="updateNode();" value="Update" style="margin-left: auto;margin-right: auto;"/>
+													</div>
 												</div>
 											</div>
 										</div>
@@ -204,7 +206,8 @@
 	<!-- inline scripts related to this page -->
 
 	<script type="text/javascript">
-		CKEDITOR.replaceAll();
+	//CKEDITOR.replaceAll();
+		CKEDITOR.replace('content', {height : 600});
 		var pid = 0;
 		var cname = $("#cname").val();
 		var cid = $("#cid").val();
@@ -229,13 +232,14 @@
 				beforeClick: beforeClick,
 				onRemove: onRemove,
 				beforeRemove: beforeRemove,
-				onClick: onClick
+				onClick: onClick,
+				onRename: onRename
 			},
 			edit: {
 				enable: true,
-				editNameSelectAll: true,
+				//editNameSelectAll: true,
 				showRemoveBtn: showRemoveBtn,
-				showRenameBtn: false
+				showRenameBtn: showRenameBtn
 			}
 		};
 		
@@ -248,13 +252,22 @@
 		};
 
 		function showRemoveBtn(treeId, treeNode) {
-			return (!treeNode.isParent&&!treeNode.isFirstNode);
+			return (!treeNode.isFirstNode);
 		};
-
+		
+		function showRenameBtn(treeId, treeNode) {
+			//&&!treeNode.isLastNode
+			return (treeNode.isParent);
+		};
+		
 		function onRemove(e, treeId, treeNode) {
-			deleteNode(treeNode.id);
+			deleteNode(treeNode);
 		};
-
+		
+		function onRename(e, treeId, treeNode, isCancel) {
+			updateNode(treeNode);
+		};
+		
 		function beforeRemove(treeId, treeNode) {
 			var zTree = $.fn.zTree.getZTreeObj("tree");
 			zTree.selectNode(treeNode);
@@ -268,7 +281,7 @@
 
 		function onClick(event, treeId, treeNode, clickFlag) {
 			//alert($("#parentId").val());
-			alert(treeNode.id+" isParent:"+treeNode.isParent);
+			//alert(treeNode.id+" isParent:"+treeNode.isParent);
 			var nid = treeNode.id;
 			if(treeNode.isParent==true){
 				$("#parentId").val(nid);
@@ -278,9 +291,11 @@
 				$("#info").css('display','block');
 				$("#update").css('display','none');
 				$("#add").css('display','block');
+				$("#filetype").css('display','block');
 			}else{
 				$("#info").css('display','block');
 				$("#add").css('display','none');
+				$("#filetype").css('display','none');
 				$("#update").css('display','block');
 				$("#itemId").val(nid);
 				getNodeInfo(nid);
@@ -317,41 +332,49 @@
 			});
 		}
 		
-		function updateNode(){
-			var itemId = $("#itemId").val();
-			var filename = $("#filename").val();
-			var content = CKEDITOR.instances.content.getData();
-			var kmitem = {
-					 	id:itemId,
-					 	filename:filename,
-					 	content:content
-			        };
+		function updateNode(node){
+			var kmitem = {};
+			if(null!=node){
+				if(node.isParent==true){
+					kmitem = {filename:node.name,id:node.id}
+				}
+			}else{
+				var itemId = $("#itemId").val();
+				var filename = $("#filename").val();
+				var content = CKEDITOR.instances.content.getData();
+				kmitem = {id:itemId,filename:filename,content:content};
+			}
 			var jsonString = JSON.stringify(kmitem);
 			//alert(kmitem);
 			$.ajax({
 				type:"post",
 				url:"/generaldms/updateKm",
 				data: jsonString,
+				dataType:"json",
 				contentType : "application/json ; charset=utf-8", 
 				success : function(resultData) {
 					if (resultData.isUpate == true) {
-						alert("成功!");
+						$.fn.zTree.init($("#tree"), setting);
+						//alert("更新成功!");
 					} else {
-						alert("失败!");
+						alert("更新失败!");
 					}
 				}
 			});
 		}
 
-		function deleteNode(id) {
+		function deleteNode(treeNode) {
+			var id = treeNode.id;
+			var isParent = treeNode.isParent;
+			var cid = $("#cid").val();
 			$.ajax({
 				type : "post",
 				dataType : "json",
 				contentType : "application/json;charset=utf-8",
-				url : "/generaldms/deleteKm?id=" + id,
+				url : "/generaldms/deleteKm?id=" + id + "&cid=" + cid + "&isParent=" + isParent,
 				success : function(data) {
 					if (data.isDelete == true) {
-						alert("删除成功!");
+						//alert("删除成功!");
 					} else {
 						alert("删除失败!");
 					}
@@ -367,21 +390,21 @@
 			var pid = 0;
 			var cname = $("#cname").val();
 			var content = CKEDITOR.instances.content.getData();
+			var kmitem = {cid:cid,parentid:parentId,filename:filename,content:content,type:type};
 			$.ajax({
 				type : "post",
 				dataType : "json",
 				contentType : "application/json;charset=utf-8",
-				url : "/generaldms/addKm?cid=" + cid + "&parentid=" + parentId
-						+ "&filename=" + filename + "&content=" + content
-						+ "&type=" + type,
-				success : function(data) {
-					if (data.isInsert == true) {
+				url : "/generaldms/addKm",
+				data:JSON.stringify(kmitem),
+				success : function(resultData) {
+					if (resultData.isInsert == true) {
 						$("#filename").val("");
 						$("#type").val("");
 						CKEDITOR.instances.content.setData("");
 						$("#info").css('display', 'none');
 						$.fn.zTree.init($("#tree"), setting);
-						alert("增加成功!");
+						//alert("增加成功!");
 					} else {
 						alert("增加失败!");
 					}
