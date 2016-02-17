@@ -36,7 +36,7 @@
     delete from kmitem
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.generaldms.entity.KmItem" >
+  <insert id="insert" parameterType="com.generaldms.entity.KmItem" useGeneratedKeys="true" keyProperty="id" >
     insert into kmitem (id, type, cid, parentId, fileName, 
       content, filePath, createDataTime, 
       author)

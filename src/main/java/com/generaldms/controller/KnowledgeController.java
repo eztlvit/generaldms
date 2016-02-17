@@ -139,6 +139,23 @@ public class KnowledgeController {
 				nodes.append(",");
 			}
 		}
+		 if(items.size()==0) {
+			KmItem kmItem = new KmItem();
+			kmItem.setCid(cid);
+			kmItem.setType("folder");
+			kmItem.setFilename("目录");
+			kmItem.setParentid(0);
+			kmItem.setCreatedatatime(new Date());
+			int count = knowledgeBiz.insertKmItem(kmItem);
+			nodes.append(" { ");
+			nodes.append("\"id\":\"" + kmItem.getId() + "\",");
+			nodes.append("\"pId\":\"" + kmItem.getParentid() + "\",");
+			nodes.append("\"name\":\"" + kmItem.getFilename() + "\"");
+			if (kmItem.getType().equalsIgnoreCase("folder")) {
+				nodes.append(",\"isParent\":\"true\"");
+			}
+			nodes.append(" } ");
+		} 
 		nodes.append(" ] ");
 		response.getWriter().print(nodes.toString());
 	}
