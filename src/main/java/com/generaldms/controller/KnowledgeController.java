@@ -139,7 +139,7 @@ public class KnowledgeController {
 				nodes.append(",");
 			}
 		}
-		 if(items.size()==0) {
+		 if(items.size()==0&&parentId==0) {
 			KmItem kmItem = new KmItem();
 			kmItem.setCid(cid);
 			kmItem.setType("folder");

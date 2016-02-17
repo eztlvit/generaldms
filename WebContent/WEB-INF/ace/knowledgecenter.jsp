@@ -76,7 +76,7 @@
 							<input id="parentId" type="hidden" value="0" />
 							<input id="itemId" type="hidden" value="0" />
 							<div class="row">
-								<div class="col-sm-2">
+								<div class="col-sm-3">
 									<div class="widget-box">
 										<div class="widget-header header-color-blue2">
 											<h4 class="lighter smaller">${cName}</h4>
@@ -90,7 +90,7 @@
 									</div>
 								</div>
 
-								<div class="col-sm-10" style="display: none;" id="info">
+								<div class="col-sm-9" style="display: none;" id="info">
 										<div class="widget-header header-color-green2">
 											<h4 class="lighter smaller" id="fileTitle">File Content</h4>
 										</div>
